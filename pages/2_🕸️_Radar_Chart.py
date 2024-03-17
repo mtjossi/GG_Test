@@ -56,6 +56,7 @@ def get_graph1(df):
     xanchor="right",
     x=0.99
 ))
+  fig.update_layout(showlegend=False)
 
   st.plotly_chart(fig, use_container_width=True)
 
@@ -102,6 +103,7 @@ def get_graph2(df):
     xanchor="left",
     x=0.99
 ))
+  fig2.update_layout(showlegend=False)
 
   st.plotly_chart(fig2, use_container_width=True)
 
@@ -109,7 +111,7 @@ with c1:
   graph_select = st.selectbox("Select which graph to display", ["CBDC Technology - Solution Assessment", "CBDC Technology - Vendor Assessment", "Both"])
 
 with c2:
-  def_num = ['1', '2']
+  def_num = ['Vendor 1', 'Vendor 2']
   df['vendor_id'] = df['vendor_id'].apply(str)
   vendor_choice = st.multiselect("Select which Vendors to Compare", 
                                options=df['vendor_id'].unique(), default=def_num +[st.session_state['focus_vendor']] if st.session_state['focus_vendor'] not in def_num else def_num)
