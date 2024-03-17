@@ -77,7 +77,7 @@ score_mean['Score2'] = score2
 score_mean['Mag'] = np.sqrt(np.square(score_mean['Score1']) + np.square(score_mean['Score2']))
 score_mean['Vendor'] = score_mean['Vendor'].apply(str)
 
-def_num = ['1', '2']
+def_num = ['Vendor 1', 'Vendor 2']
 vendor_choice = st.multiselect("Select which Vendors to Compare", 
                                options=score_mean['Vendor'].unique(), default=def_num +[st.session_state['focus_vendor']] if st.session_state['focus_vendor'] not in def_num else def_num)
 selected_df = score_mean.query(f"Vendor in @vendor_choice")
