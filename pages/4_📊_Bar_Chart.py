@@ -78,7 +78,7 @@ score_mean['Mag'] = np.sqrt(np.square(score_mean['Score1']) + np.square(score_me
 score_mean['Vendor'] = score_mean['Vendor'].apply(str)
 score_mean['Mag'] = np.round(score_mean['Mag'])
 
-def_num = ['1', '2']
+def_num = ['Vendor 1', 'Vendor 2']
 vendor_choice = st.multiselect("Select which Vendors to Compare", 
                                options=score_mean['Vendor'].unique(), default=def_num +[st.session_state['focus_vendor']] if st.session_state['focus_vendor'] not in def_num else def_num)
 selected_df = score_mean.query(f"Vendor in @vendor_choice")
@@ -91,12 +91,13 @@ fig = px.bar(data, x='Vendor', y='Mag', hover_data=["Mag"], color="Vendor",
 fig.update_layout(xaxis={'categoryorder':'total ascending'})
 fig.update_yaxes(range=[0,100])
 fig.update_layout(title_text=("<b>CBDC Technology Overall Score</b>"))
+fig.update_layout(showlegend=False)
 add_mean = st.checkbox("Display mean?")
 if add_mean:
   fig.add_hline(y=score_mean["Mag"].mean(), line_dash="dash", line_color="white", annotation_text="Overall Mean")
-  fig.add_hline(y=data["Mag"].mean(), line_dash="dash", line_color="lightseagreen")
+  # fig.add_hline(y=data["Mag"].mean(), line_dash="dash", line_color="lightseagreen")
   # fig.add_hline(y=data["Mag"].mean(), line_dash="dash", line_color="yellow", annotation_text="Selection Mean")
-  fig.add_annotation(text="Selection Mean", x=data['Vendor'].max(), y=data["Mag"].mean())
-  fig.update_annotations(x=1, xanchor='auto')
+  # fig.add_annotation(text="Selection Mean", x=data['Vendor'].max(), y=data["Mag"].mean())
+  fig.update_annotations(x=0, xanchor='auto')
   fig.update_layout(title_text=("<b>CBDC Technology Overall Score</b>"))
-st.plotly_chart(fig)
+st.plotly_chart(fig, use_container_width=True)
