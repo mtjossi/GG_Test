@@ -76,25 +76,28 @@ score_mean['Score2'] = score2
 
 score_mean['Mag'] = np.sqrt(np.square(score_mean['Score1']) + np.square(score_mean['Score2']))
 score_mean['Vendor'] = score_mean['Vendor'].apply(str)
+score_mean['Mag'] = np.round(score_mean['Mag'])
 
 def_num = ['Vendor 1', 'Vendor 2']
 vendor_choice = st.multiselect("Select which Vendors to Compare", 
                                options=score_mean['Vendor'].unique(), default=def_num +[st.session_state['focus_vendor']] if st.session_state['focus_vendor'] not in def_num else def_num)
 selected_df = score_mean.query(f"Vendor in @vendor_choice")
+data = score_mean.query(f"Vendor in @vendor_choice")[["Vendor", "Mag"]]
 
-fig = go.Figure()
-# vendor_colors = ["#f25454", "#f2a154", "#f7e25f", "#fffadb", "#c7f6ff"]
-vendor_colors = ["#f2a154", "#c7f6ff", "#f25454", "#f7e25f", "#fffadb"]
-fig.add_trace(go.Scatter(
-    x=score_mean['Mag'], y=np.zeros(selected_df.shape[0]), mode='markers', marker_size=20,
-    marker_color=vendor_colors, opacity=.9
-))
-fig.update_xaxes(showgrid=False, range=[0,100])
-fig.update_yaxes(showgrid=False, 
-                 zeroline=True, zerolinecolor='white', zerolinewidth=5,
-                 showticklabels=False)
-# fig.update_layout(height=200, plot_bgcolor='black', 
-#                   title=("<b>Galactic Grid</b><br>"+"<i>Chavanette's CBDC Vendor Assessment</i>"))
 
-fig.update_layout(height=200, plot_bgcolor='black')
-st.plotly_chart(fig)
+
+fig = px.bar(data, x='Vendor', y='Mag', hover_data=["Mag"], color="Vendor",
+             labels={"Mag":"Vendor Overall Score"})
+fig.update_layout(xaxis={'categoryorder':'total ascending'})
+fig.update_yaxes(range=[0,100])
+fig.update_layout(title_text=("<b>CBDC Technology Overall Score</b>"))
+fig.update_layout(showlegend=False)
+add_mean = st.checkbox("Display mean?")
+if add_mean:
+  fig.add_hline(y=score_mean["Mag"].mean(), line_dash="dash", line_color="white", annotation_text="Overall Mean")
+  # fig.add_hline(y=data["Mag"].mean(), line_dash="dash", line_color="lightseagreen")
+  # fig.add_hline(y=data["Mag"].mean(), line_dash="dash", line_color="yellow", annotation_text="Selection Mean")
+  # fig.add_annotation(text="Selection Mean", x=data['Vendor'].max(), y=data["Mag"].mean())
+  fig.update_annotations(x=0, xanchor='auto')
+  fig.update_layout(title_text=("<b>CBDC Technology Overall Score</b>"))
+st.plotly_chart(fig, use_container_width=True)
