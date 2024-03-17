@@ -88,7 +88,7 @@ score_mean['Vendor'] = score_mean['Vendor'].apply(str)
 
 marker_size = score_mean["Mag"]
 vendor_colors = ["#f2a154", "#c7f6ff", "#f25454", "#f7e25f", "#fffadb"]
-def_num = ['1', '2']
+def_num = ['Vendor 1', 'Vendor 2']
 vendor_choice = st.multiselect("Select which Vendors to Compare", 
                                options=score_mean['Vendor'].unique(), default=def_num +[st.session_state['focus_vendor']] if st.session_state['focus_vendor'] not in def_num else def_num)
 # st.session_state['focus_vendor'] = vendor_choice
@@ -104,12 +104,38 @@ data = go.Scatter(
                   sizemode='diameter',
                   sizeref=max(marker_size)/20,
                   sizemin=1,
-                  color=vendor_colors
+                  color=vendor_colors,
+                  opacity=1
               ),
-    showlegend=False
+               legendgroup="vendors",
+    showlegend=False,
+    name='Vendor Score'
 )
-
-fig = go.Figure(data)
+fig = go.Figure()
+fig.add_trace(go.Scatter(x=[i for i in range(0,100)], y=np.ones(100)*50, 
+                         line=dict(color='royalblue', width=1, dash='dot'), showlegend=False,
+                         visible='legendonly'))
+fig.add_trace(go.Scatter(x=np.ones(100)*50, y=[i for i in range(0,100)], 
+                         line=dict(color='royalblue', width=1, dash='dot'), showlegend=False,
+                         visible='legendonly'))
+fig.add_trace(go.Scatter(x=[0, 50, 50, 0], y= [0, 0, 50, 50],
+                         fill='toself', fillcolor='black', showlegend=False,
+                         text="Blackhole", opacity=.5, legendgroup="quads", 
+                         name="", mode='lines'))
+fig.add_trace(go.Scatter(x=[0, 0, 50, 50], y= [50, 100, 100, 50],
+                         fill='toself', fillcolor='yellow', showlegend=False,
+                         text="Comets", opacity=.5, legendgroup="quads", 
+                         name="", mode='lines'))
+fig.add_trace(go.Scatter(x=[50, 50, 100, 100], y= [0, 50, 50, 0],
+                         fill='toself', fillcolor='orange', showlegend=False,
+                         text="Protostar", opacity=.5, legendgroup="quads", 
+                         name="", mode='lines'))
+fig.add_trace(go.Scatter(x=[50, 50, 100, 100], y= [50, 100, 100, 50],
+                         fill='toself', fillcolor='lightblue', showlegend=False,
+                         text="Supernova", opacity=.5, legendgroup="quads", 
+                         name="", mode='lines'))
+# fig = go.Figure(data)
+fig.add_trace(data)
 
 # fig = px.scatter(score_mean, x="Score1", y="Score2",
 # 	         size="Mag", color="Vendor",
@@ -117,32 +143,28 @@ fig = go.Figure(data)
 #                  text=score_mean["Vendor"],
 #                  ,
 #                  )
-fig.update_traces(hovertemplate='Vendor: %{text}<br>Score: %{marker.size}')
+fig.update_traces(hovertemplate='%{text}<br>Score: %{marker.size}')
+fig.update_layout(legend_title="Legend Title")
 
-fig.add_trace(go.Scatter(x=[i for i in range(0,100)], y=np.ones(100)*50, 
-                         line=dict(color='royalblue', width=1, dash='dot'), showlegend=False))
-fig.add_trace(go.Scatter(x=np.ones(100)*50, y=[i for i in range(0,100)], 
-                         line=dict(color='royalblue', width=1, dash='dot'), showlegend=False))
 
 show_mean = st.checkbox("Show Mean Scores")
 if show_mean:
-  fig.add_trace(go.Scatter(mode='markers', x=[np.mean(selected_df['Score1'])], y=[np.mean(selected_df['Score2'])], 
-                          line=dict(color='red', width=10, dash='dot'), showlegend=True,
-                          marker_symbol='asterisk-open', 
-                          hovertemplate='Selection Mean<br>Score: %{marker.size}',
-                          marker=dict(
-                            size=marker_size,
-                            sizemode='diameter',
-                            sizeref=max(marker_size)/15,
-                            sizemin=1,
-                            color=vendor_colors
-                          ),
-                          name="Selection Mean"
-              ))
+  # fig.add_trace(go.Scatter(mode='markers', x=[np.mean(selected_df['Score1'])], y=[np.mean(selected_df['Score2'])], 
+  #                         line=dict(color='red', width=10, dash='dot'), showlegend=True,
+  #                         marker_symbol='hash-dot', 
+  #                         hovertemplate='Selection Mean<br>Score: %{marker.size}',
+  #                         marker=dict(
+  #                           size=marker_size,
+  #                           sizemode='diameter',
+  #                           sizeref=max(marker_size)/15,
+  #                           sizemin=1,
+  #                           color=vendor_colors
+  #                         ),
+  #                         name="Selection Mean"
+  #             ))
   fig.add_trace(go.Scatter(mode='markers', x=[np.mean(score_mean['Score1'])], y=[np.mean(score_mean['Score2'])], 
                           line=dict(color='white', shape='spline', dash='dot'), showlegend=True,
-                          marker_symbol='hash-dot', 
-                          hovertemplate='Overall Mean<br>Score1: %{x}<br>Score2: %{y}',
+                          marker_symbol='asterisk', 
                            marker=dict(
                             size=marker_size,
                             sizemode='diameter',
@@ -150,6 +172,7 @@ if show_mean:
                             sizemin=1,
                             color=vendor_colors
                             ),
+                            hovertemplate='Overall Mean<br>Score: %{marker_size}<br>Score2: %{y}',
                             name="Overall Mean"
                           ))
 
