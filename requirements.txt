@@ -2,4 +2,3 @@ numpy
 plotly
 pandas
 matplotlib
-sqlite3
